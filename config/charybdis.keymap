@@ -6,6 +6,7 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
 #include <dt-bindings/zmk/rgb.h>
+#include <dt-bindings/zmk/automouse.h>
 
 #define ZMK_POINTING_DEFAULT_MOVE_VAL 1000 // 600
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 12   // 10
@@ -32,8 +33,15 @@
     trigger-period-ms = <16>;
 };
 
+&hid_trackball_interface {
+    automouse-layer = <1>;          // Включать этот слой автоматически при движении шара
+    automouse-layer-timeout-ms = <600>; // Возврат на базовый слой после 600 мс бездействия
+    // scroll-layers = <2>;            // На этом слое трекбол работает как скролл (Drag Scroll)
+    // snipe-layers = <3>;             // На этом слое включается режим высокой точности (DPI снижен)
+};
+
 / {
-    // 上下滚动编码器行为
+    // Поведение энкодера прокрутки вверх и вниз
 
     scroll_vertical_encoder: scroll_vertical_encoder {
         compatible = "zmk,behavior-sensor-rotate";
@@ -43,7 +51,7 @@
         tap-ms = <100>;
     };
 
-    // 左右滚动编码器行为
+    // Поведение энкодера прокрутки влево и вправо
 
     scroll_horizontal_encoder: scroll_horizontal_encoder {
         compatible = "zmk,behavior-sensor-rotate";
@@ -54,9 +62,56 @@
     };
 
     behaviors {
+        // Создаем зажатие клавиши для снайперского режима
+        ts_snipe: trackball_snipe {
+            compatible = "zmk,behavior-pointing-snipe";
+            #binding-cells = <0>;
+            // Настройка замедления: делит текущую скорость XY на эти значения.
+            // Например: 4 1 означает, что скорость по Х и Y уменьшится в 4 раза.
+            velocity-multiplier = <4 1>; 
+        };
+
+        // Кнопка режима Drag Scroll (прокрутка шаром)
+        ts_scroll: trackball_scroll {
+            compatible = "zmk,behavior-pointing-scroll";
+            #binding-cells = <0>;
+            trigger-toggle; // Позволяет как удерживать, так и переключать кликом
+        };
+
+        // Настройка двойного клика для ВХОДА в игровой режим
+        game_dance_on: game_dance_on {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <250>; // Время в мс, в течение которого нужно успеть нажать второй раз
+            bindings = <&kp MINUS>, <&tog_game_on>; // 1 клик = клавиша "ж" (;), 2 клика = макрос игры
+        };
+
+        // Настройка двойного клика для ВЫХОДА из игрового режима
+        game_dance_off: game_dance_off {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <250>;
+            bindings = <&kp MINUS>, <&tog_game_off>; // 1 клик = клавиша "ж" (;), 2 клика = выход из игры
+        };
     };
 
     macros {
+        // Макрос для включения Игры: отключает авто-мышь, меняет подсветку на Красный и включает Игровой Слой (слой 6)
+        tog_game_on: tog_game_on {
+            compatible = "zmk,behavior-macro";
+            label = "tog_game_on";
+            #binding-cells = <0>;
+            bindings = <&amc AM_OFF &rgb_ug RGB_COLOR_HSB(0,100,50) &to 6>;
+        };
+
+        // Макрос для выхода из Игры: возвращает авто-мышь, сбрасывает подсветку и возвращает на слой 0
+        tog_game_off: tog_game_off {
+            compatible = "zmk,behavior-macro";
+            label = "tog_game_off";
+            #binding-cells = <0>;
+            bindings = <&amc AM_ON &rgb_ug RGB_EFR &to 0>;
+        };
+
         To1_macro: To1_macro {
             compatible = "zmk,behavior-macro";
             label = "To1_macro";
@@ -101,23 +156,23 @@
 &kp ESC         &kp N1  &kp N2  &kp N3        &kp N4     &kp N5      &kp N6     &kp N7     &kp N8     &kp N9            &kp N0    &kp BACKSPACE
 &kp TAB         &kp Q   &kp W   &kp E         &kp R      &kp T       &kp Y      &kp U      &kp I      &kp O             &kp P     &kp BSLH
 &kp LEFT_SHIFT  &kp A   &kp S   &kp D         &kp F      &kp G       &kp H      &kp J      &kp K      &kp L             &kp SEMI  &kp SQT
-&kp LCTRL       &kp Z   &kp X   &kp C         &kp V      &kp B       &kp N      &kp M      &kp COMMA  &kp LEFT_BRACKET  &kp FSLH  &kp MINUS
+&kp LCTRL       &kp Z   &kp X   &kp C         &kp V      &kp B       &kp N      &kp M      &kp COMMA  &kp LEFT_BRACKET  &kp FSLH  &game_dance_on
                                 &kp LEFT_ALT  &kp SPACE  &to 1       &kp LWIN   &kp SPACE
                                               &mkp MB1   &mkp MB2    &kp ENTER
             >;
 
             sensor-bindings =
                 <&scroll_vertical_encoder>,
-                // 编码器1：上下滚动,,
+                // Энкодер 1: Прокрутка вверх и вниз.
                 <&scroll_horizontal_encoder>;
 
-            // 编码器2：左右滚动
+            // Энкодер 2: Прокрутка влево и вправо
         };
 
         layer_1 {
             bindings = <
 &kp F1          &kp F2           &kp F3           &kp F4           &kp F5           &kp F6        &kp F7     &kp F8    &kp F9      &kp F10            &kp F11  &kp F12
-&kp CAPS        &none            &none            &none            &none            &none         &none      &none     &kp UP      &none              &none    &none
+&kp CAPS        &none            &none            &none            &none            &none         &none      &ts_snipe &kp UP      &ts_scroll         &none    &none
 &kp LEFT_SHIFT  &none            &none            &none            &bt BT_NXT       &bt BT_CLR    &none      &kp LEFT  &kp DOWN    &kp RIGHT          &none    &none
 &kp LCTRL       &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &rgb_ug RGB_EFF  &rgb_ug RGB_TOG  &none         &none      &none     &kp PERIOD  &kp RIGHT_BRACKET  &none    &kp EQUAL
                                                   &kp LEFT_ALT     &kp SPACE        &to 0         &none      &none
@@ -127,12 +182,12 @@
 
         layer_2 {
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &none     &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &none     &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
-                        &trans  &trans  &trans    &trans  &trans
-                                &trans  &trans    &trans
+&kp ESC         &kp N1  &kp N2  &kp N3        &kp N4     &kp N5      &kp N6     &kp N7     &kp N8     &kp N9            &kp N0    &kp BACKSPACE
+&kp TAB         &kp Q   &kp W   &kp E         &kp R      &kp T       &kp Y      &kp U      &kp I      &kp O             &kp P     &kp BSLH
+&kp LEFT_SHIFT  &kp A   &kp S   &kp D         &kp F      &kp G       &kp H      &kp J      &kp K      &kp L             &kp SEMI  &kp SQT
+&kp LCTRL       &kp Z   &kp X   &kp C         &kp V      &kp B       &kp N      &kp M      &kp COMMA  &kp LEFT_BRACKET  &kp FSLH  &game_dance_off
+                                &kp LEFT_ALT  &kp SPACE  &to 0       &kp LWIN   &kp SPACE
+                                              &mkp MB1   &mkp MB2    &kp ENTER
             >;
         };
 
