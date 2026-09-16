@@ -1,15 +1,15 @@
 #include <dt-bindings/zmk/mouse.h>
 #include <input/processors.dtsi>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <dt-bindings/zmk/automouse.h>
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
 #include <dt-bindings/zmk/rgb.h>
-#include <dt-bindings/zmk/automouse.h> 
 
-#define ZMK_POINTING_DEFAULT_MOVE_VAL 1000 
-#define ZMK_POINTING_DEFAULT_SCRL_VAL 12   
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 1000
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 12
 
 &lt {
     tapping-term-ms = <180>; // Немного уменьшили для более отзывчивого пробела-слоя
@@ -22,9 +22,9 @@
 &msc_input_listener { input-processors = <&zip_scroll_scaler 2 1>; };
 
 &msc {
-    acceleration-exponent = <0>;      
-    time-to-max-speed-ms = <100>;       
-    delay-ms = <0>;                   
+    acceleration-exponent = <0>;
+    time-to-max-speed-ms = <100>;
+    delay-ms = <0>;
 };
 
 &mmv {
@@ -34,10 +34,10 @@
 };
 
 &hid_trackball_interface {
-    automouse-layer = <1>;          
-    automouse-layer-timeout-ms = <600>; 
+    automouse-layer = <1>;
+    automouse-layer-timeout-ms = <600>;
     scroll-layers = <5>; // Скролл шаром теперь на слое 5 (бывший layer_5)            
-    snipe-layers = <3>;             
+    snipe-layers = <3>;
 };
 
 / {
@@ -45,6 +45,7 @@
         compatible = "zmk,behavior-sensor-rotate";
         #sensor-binding-cells = <0>;
         bindings = <&msc SCRL_DOWN>, <&msc SCRL_UP>;
+
         tap-ms = <100>;
     };
 
@@ -52,6 +53,7 @@
         compatible = "zmk,behavior-sensor-rotate";
         #sensor-binding-cells = <0>;
         bindings = <&msc SCRL_LEFT>, <&msc SCRL_RIGHT>;
+
         tap-ms = <100>;
     };
 
@@ -59,27 +61,34 @@
         ts_snipe: trackball_snipe {
             compatible = "zmk,behavior-pointing-snipe";
             #binding-cells = <0>;
-            velocity-multiplier = <4 1>; 
+            velocity-multiplier = <4 1>;
         };
 
         ts_scroll: trackball_scroll {
             compatible = "zmk,behavior-pointing-scroll";
             #binding-cells = <0>;
-            trigger-toggle; 
+            trigger-toggle;
         };
 
         game_dance_on: game_dance_on {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <250>; 
-            bindings = <&kp SEMI>, <&tog_game_on>; 
+            tapping-term-ms = <250>;
+            bindings = <&kp SEMI>, <&tog_game_on>;
         };
 
         game_dance_off: game_dance_off {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <250>;
-            bindings = <&kp SEMI>, <&tog_game_off>; 
+            bindings = <&kp SEMI>, <&tog_game_off>;
+        };
+
+        caps_dance: caps_dance {
+            compatible = "zmk,behavior-tap-dance";
+            label = "CAPS_DANCE";
+            #binding-cells = <0>;
+            bindings = <&kp LEFT_SHIFT>, <&kp CAPSLOCK>;
         };
     };
 
@@ -137,53 +146,55 @@
     keymap {
         compatible = "zmk,keymap";
 
-        Colemak-DH {
+        qwerty {
             bindings = <
-&kp ESC         &kp N1  &kp N2  &kp N3        &kp N4        &kp N5      &kp N6     &kp N7     &kp N8     &kp N9            &kp N0    &kp BACKSPACE
-&kp TAB         &kp Q   &kp W   &kp F         &kp P         &kp B       &kp J      &kp L      &kp U      &kp Y             &kp SEMI  &kp BSLH
-&kp LEFT_SHIFT  &kp A   &kp R   &kp S         &kp T         &kp G       &kp M      &kp N      &kp E      &kp I             &game_dance_on &kp SQT
-&kp LCTRL       &kp Z   &kp X   &kp C         &kp V         &kp D       &kp K      &kp H      &kp COMMA  &kp DOT           &kp FSLH  &kp MINUS
-                                &kp LEFT_ALT  &lt 2 SPACE   &to 1       &kp LWIN   &kp SPACE
-                                              &mkp MB1      &mkp MB2    &kp ENTER
+&kp GRAVE         &kp N1          &kp N2          &kp N3              &kp N4            &kp N5           &kp N6  &kp N7             &kp N8               &kp N9           &kp N0                   &kp BACKSPACE
+&kp TAB           &kp Q           &kp W           &kp E               &kp R             &kp T            &kp Y   &kp U              &kp I                &kp O            &kp P                    &kp LEFT_BRACKET
+&caps_dance       &mt LEFT_WIN A  &mt LEFT_ALT S  &mt LEFT_CONTROL D  &mt LEFT_SHIFT F  &kp G            &kp H   &mt RIGHT_SHIFT J  &mt RIGHT_CONTROL K  &mt RIGHT_ALT L  &mt RIGHT_WIN SEMICOLON  &kp RIGHT_BRACKET
+&kp LEFT_CONTROL  &kp Z           &kp X           &kp C               &kp V             &kp B            &kp N   &kp M              &kp COMMA            &kp DOT          &kp FSLH                 &kp BACKSLASH
+                                                  &kp ESCAPE          &mo 2             &kp BACKSPACE    &mo 3   &kp ENTER
+                                                                      &kp SPACE         &mo 1            &mo 2
             >;
 
-            sensor-bindings = <&scroll_vertical_encoder>, <&scroll_horizontal_encoder>;
+            sensor-bindings =
+                <&scroll_vertical_encoder>,
+                <&scroll_horizontal_encoder>;
         };
 
-        layer_1 { // Навигация и Хоткеи
+        Symbols {
             bindings = <
-&kp F1          &kp F2           &kp F3           &kp F4           &kp F5           &kp F6        &kp F7     &kp F8    &kp F9      &kp F10            &kp F11  &kp F12
-&kp CAPS        &none            &none            &none            &none            &none         &none      &none     &kp UP      &none              &none    &none
-&kp LEFT_SHIFT  &none            &none            &none            &bt BT_NXT       &bt BT_CLR    &none      &kp LEFT  &kp DOWN    &kp RIGHT          &none    &none
-&kp LCTRL       &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &rgb_ug RGB_EFF  &rgb_ug RGB_TOG  &none         &none      &none     &kp PERIOD  &kp RIGHT_BRACKET  &none    &kp EQUAL
-                                                  &kp LEFT_ALT     &kp SPACE        &to 0         &none      &none
-                                                                   &mkp MB1         &mkp MB2      &kp ENTER
-            >;
-        };
-
-        layer_2 { // НОВЫЙ: Слой символов для программирования (активация по удержанию Space слева)
-            bindings = <
-&trans  &trans    &trans    &trans    &trans    &trans      &trans     &trans     &trans    &trans    &trans    &kp DEL
-&trans  &kp EXCL  &kp AT    &kp LBRC  &kp RBRC  &kp PIPE    &kp AMPS   &kp EQUAL  &kp PLUS  &kp ASTRK &kp PRCNT &trans
-&trans  &kp HASH  &kp DLLR  &kp LPAR  &kp RPAR  &kp GRAVE   &kp TILDE  &kp MINUS  &kp UNDER &kp COLON &kp QMARK &trans
-&trans  &kp CARET &kp LBRC  &kp LBKT  &kp RBKT  &kp BSLH    &trans     &trans     &trans    &trans    &trans    &trans
-                            &trans    &trans    &trans      &trans     &trans
-                                      &trans    &trans      &trans
+&kp F1          &kp F2           &kp F3           &kp F4           &kp F5           &kp F6        &kp F7           &kp F8                &kp F9                 &kp F10           &kp F11            &kp F12
+&kp CAPS        &kp AMPERSAND    &kp PIPE         &kp EXCLAMATION  &none            &none         &kp AMPERSAND    &kp LEFT_BRACE        &kp RIGHT_BRACE        &kp LESS_THAN     &kp GREATER_THAN   &none
+&kp LEFT_SHIFT  &none            &none            &none            &bt BT_NXT       &bt BT_CLR    &kp EXCLAMATION  &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS  &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &none
+&kp LCTRL       &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &rgb_ug RGB_EFF  &rgb_ug RGB_TOG  &none         &kp HASH         &kp UNDERSCORE        &kp PLUS               &kp EQUAL         &none              &kp EQUAL
+                                                  &kp LEFT_ALT     &kp SPACE        &to 0         &trans           &trans
+                                                                   &none            &mkp MB2      &trans
             >;
         };
 
-        layer_3 { // Снайперский слой трекбола
+        layer_2 {
             bindings = <
-&none  &none   &none    &none   &none        &none         &kp N1     &none      &none            &none            &none            &to 0
-&none  &none   &none    &none   &none        &none         &none      &none      &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &rgb_ug RGB_EFF  &rgb_ug RGB_TOG
-&none  &none   &none    &none   &none        &none         &none      &mkp LCLK  &mkp RCLK        &none            &none            &none
-&none  &none   &none    &none   &bt BT_NXT   &bt BT_CLR    &none      &none      &none            &none            &none            &none
-                                &none        &none         &none      &none      &none
-                                             &none         &none      &none
+&trans  &trans     &trans    &trans    &trans    &trans       &trans     &trans     &trans     &trans     &trans     &kp DEL
+&trans  &kp EXCL   &kp AT    &kp LBRC  &kp RBRC  &kp PIPE     &kp AMPS   &kp EQUAL  &kp PLUS   &kp ASTRK  &kp PRCNT  &trans
+&trans  &kp HASH   &kp DLLR  &kp LPAR  &kp RPAR  &kp GRAVE    &kp TILDE  &kp MINUS  &kp UNDER  &kp COLON  &kp QMARK  &trans
+&trans  &kp CARET  &kp LBRC  &kp LBKT  &kp RBKT  &kp BSLH     &trans     &trans     &trans     &trans     &trans     &trans
+                             &trans    &trans    &trans       &trans     &trans
+                                       &trans    &trans       &trans
             >;
         };
 
-        Mouse { // Служебный слой мыши
+        layer_3 {
+            bindings = <
+&none  &none  &none  &none  &none       &none         &kp N1  &none      &none            &none            &none            &to 0
+&none  &none  &none  &none  &none       &none         &none   &none      &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &rgb_ug RGB_EFF  &rgb_ug RGB_TOG
+&none  &none  &none  &none  &none       &none         &none   &mkp LCLK  &mkp RCLK        &none            &none            &none
+&none  &none  &none  &none  &bt BT_NXT  &bt BT_CLR    &none   &none      &none            &none            &none            &none
+                     &none  &none       &none         &none   &none
+                            &none       &none         &none
+            >;
+        };
+
+        Mouse {
             bindings = <
 &none        &none         &none         &none         &none      &none         &none       &none      &none         &none         &none         &none
 &none        &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 3  &none      &bt BT_CLR    &bt BT_CLR  &none      &bt BT_SEL 2  &bt BT_SEL 1  &bt BT_SEL 0  &none
@@ -194,7 +205,7 @@
             >;
         };
 
-        layer_5 { // Слой Drag Scroll трекбола
+        layer_5 {
             bindings = <
 &trans  &trans  &trans     &trans     &trans     &trans       &trans     &trans     &trans     &trans     &trans  &trans
 &trans  &trans  &trans     &trans     &trans     &trans       &trans     &trans     &trans     &trans     &trans  &trans
@@ -205,13 +216,14 @@
             >;
         };
 
-        Gaming { // Игровой слой (Чистый QWERTY, авто-мышь отключена)
+        Gaming {
             bindings = <
-&kp ESC         &kp N1     &kp N2  &kp N3     &kp N4     &kp N5      &kp N6     &kp N7     &kp N8     &kp N9            &kp N0    &kp BACKSPACE
-&kp TAB         &kp Q      &kp W   &kp E      &kp R      &kp T       &kp Y      &kp U      &kp I      &kp O             &kp P     &kp BSLH
-&kp LEFT_SHIFT  &kp A      &kp S   &kp D      &kp F      &kp G       &kp H      &kp J      &kp K      &kp L             &game_dance_off &kp SQT
-&kp LCTRL       &kp Z      &kp X   &kp C      &kp V      &kp B       &kp N      &kp M      &kp COMMA  &kp LEFT_BRACKET  &kp FSLH  &kp MINUS
-&kp LEFT_ALT    &kp SPACE  &none   &kp LWIN   &kp SPACE&mkp MB1   &mkp MB2    &kp ENTER
+&kp ESC         &kp N1  &kp N2  &kp N3        &kp N4     &kp N5      &kp N6     &kp N7     &kp N8     &kp N9            &kp N0           &kp BACKSPACE
+&kp TAB         &kp Q   &kp W   &kp E         &kp R      &kp T       &kp Y      &kp U      &kp I      &kp O             &kp P            &kp BSLH
+&kp LEFT_SHIFT  &kp A   &kp S   &kp D         &kp F      &kp G       &kp H      &kp J      &kp K      &kp L             &game_dance_off  &kp SQT
+&kp LCTRL       &kp Z   &kp X   &kp C         &kp V      &kp B       &kp N      &kp M      &kp COMMA  &kp LEFT_BRACKET  &kp FSLH         &kp MINUS
+                                &kp LEFT_ALT  &kp SPACE  &none       &kp LWIN   &kp SPACE
+                                              &mkp MB1   &mkp MB2    &kp ENTER
             >;
         };
     };
