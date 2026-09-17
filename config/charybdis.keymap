@@ -181,14 +181,14 @@
             >;
         };
 
-        layer_2 {
+        symbols {
             bindings = <
-&trans  &trans     &trans    &trans    &trans    &trans       &trans     &trans     &trans     &trans     &trans     &kp DEL
-&trans  &kp EXCL   &kp AT    &kp LBRC  &kp RBRC  &kp PIPE     &kp AMPS   &kp EQUAL  &kp PLUS   &kp ASTRK  &kp PRCNT  &trans
-&trans  &kp HASH   &kp DLLR  &kp LPAR  &kp RPAR  &kp GRAVE    &kp TILDE  &kp MINUS  &kp UNDER  &kp COLON  &kp QMARK  &trans
-&trans  &kp CARET  &kp LBRC  &kp LBKT  &kp RBKT  &kp BSLH     &trans     &trans     &trans     &trans     &trans     &trans
-                             &trans    &trans    &trans       &trans     &trans
-                                       &trans    &trans       &trans
+&trans  &kp EXCLAMATION  &kp AT_SIGN    &kp HASH      &kp DOLLAR            &kp PERCENT              &kp HOME       &kp GRAVE          &kp TILDE          &kp RIGHT_WIN  &kp RIGHT_ALT  &kp BACKSPACE
+&trans  &kp CARET        &kp AMPERSAND  &kp ASTERISK  &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS    &kp END        &kp LEFT_BRACKET   &kp RIGHT_BRACKET  &kp SEMICOLON  &kp COLON      &kp SQT
+&trans  &kp MINUS        &kp EQUAL      &kp PLUS      &kp LESS_THAN         &kp GREATER_THAN         &kp PAGE_UP    &kp DOUBLE_QUOTES  &kp COMMA          &kp PERIOD     &kp QMARK      &kp BACKSLASH
+&trans  &kp UNDERSCORE   &kp PIPE       &kp SLASH     &kp LEFT_BRACE        &kp RIGHT_BRACE          &kp PAGE_DOWN  &kp ESCAPE         &kp ENTER          &kp SPACE      &kp DELETE     &kp INSERT
+                                        &trans        &trans                &trans                   &trans         &trans
+                                                      &trans                &trans                   &trans
             >;
         };
 
